@@ -1,0 +1,15 @@
+{
+  "name": "gt.demo",
+  "version": "0.0.1",
+  "description": "mys gt demo",
+  "author": "Miao-Yunzai@user",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "app": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "lodash": "^4.17.21"
+  }
+}
