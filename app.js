@@ -36,7 +36,7 @@ class example {
   /** 渲染引擎为常用的art-template */
   index (req, res, next) {
     let { key } = req.params
-    if (!key || !this.isRegister[key]) return next('error')
+    if (!key || !this.isRegister[key]) return next('验证信息不存在或已失效。')
     res.render('GTest/main', { key, copyright: this.cfg.Copyright })
   }
 
