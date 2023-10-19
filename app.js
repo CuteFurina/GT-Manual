@@ -1,8 +1,9 @@
-import lodash from 'lodash'
 import express from 'express'
-import { resolve } from 'node:path'
-import fs from 'node:fs'
 import template from 'express-art-template'
+import https from 'https'
+import lodash from 'lodash'
+import fs from 'node:fs'
+import { resolve } from 'node:path'
 import YAML from 'yaml'
 
 class example {
@@ -17,7 +18,19 @@ class example {
   }
 
   load (app) {
-    app.listen(this.cfg.Port)
+    if (this.cfg.Https) {
+      let cert = {
+        key: fs.readFileSync('./data/SSL/private.key', 'utf8'),
+        cert: fs.readFileSync('./data/SSL/certificate.crt', 'utf8')
+      }
+      https.createServer(cert, app).listen(this.cfg.Port)
+    } else {
+      app.listen(this.cfg.Port)
+    }
+    this.route(app)
+  }
+
+  route (app) {
     app.use(express.static(resolve('public')))
     app.use(express.urlencoded({ extended: false }))
     app.use(express.json())
@@ -115,9 +128,10 @@ class example {
   }
 
   get address () {
-    let { Host, Port, Key } = this.cfg
-    if (Port !== 80) Host += `:${Port}`
-    return `http://${Host}/GTest`
+    let { Host, Port, Https, Key } = this.cfg
+    let protocol = Https ? 'https' : 'http'
+    if (![80, 443].includes(Port)) Host += `:${Port}`
+    return `${protocol}://${Host}/GTest`
   }
 
   self (fn) {
