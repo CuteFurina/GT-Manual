@@ -46,7 +46,7 @@ class example {
     app.use(this.error)
   }
 
-  /** 渲染引擎为常用的art-template */
+  /** 模板引擎为常用的art-template */
   index (req, res, next) {
     let { key } = req.params
     if (!key || !this.isRegister[key]) return next('验证信息不存在或已失效。')

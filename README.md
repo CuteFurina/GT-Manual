@@ -3,7 +3,7 @@
 * 此demo仅提供思路，可以参考demo自行编写内容至您的站点
  
 * ~~使用Yunzai-Bot可以参考此[提交](https://gitee.com/QQ1146638442/Miao-Yunzai/commit/c286fd0627253f8790912ad5802d6da0b9192774)~~  
-使用Miao-Yunzai可以参考此插件[GT-Manual-Handler.js](https://static.hlhs-nb.cn/upload/GT-Manual-Handler.js)  
+使用Miao-Yunzai可以参考此插件[GT-Manual-Handler.js_v1.1](https://static.hlhs-nb.cn/upload/GT-Manual-Handler.js)  
 若您不想部署demo或没有公网地址可以使用他人提供的公益接口
  
 * 值得一提的是QQ不允许直接访问IP地址  
