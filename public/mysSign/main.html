@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>GTest</title>
+    <title>签到</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
   </head>
   <body>
-    <h1></h1><br>
-    <div id="captcha" key="{{key}}">
-      <button id="btn"><span>点击验证</span></button>
+    <h1 key="{{key}}" id="{{user.id}}" connect="{{user.connect}}">米游社签到</h1>
+    {{each user.uids item}}
+    <div id="captcha" uid="{{item.uid}}" game="{{item.game}}">
+      <p>{{item.game.toUpperCase()}} · UID：{{item.uid}}</p>
+      {{if !item.status}}<input type="button" class="primary" value="点击签到">{{else}}<p>{{item.status.msg}}</p>{{/if}}
       <div id="wait" class="show">
         <div class="progress"></div>
       </div>
     </div>
+    {{/each}}
     <footer id="footer">
       <p class="copyright">{{copyright}}</p>
     </footer>
