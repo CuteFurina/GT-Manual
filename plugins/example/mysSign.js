@@ -55,12 +55,17 @@ export class MysSign extends plugin {
     }
     connect = _connection[connect]
     let user = connect[key]
-    let uidData = user.uids.find(v => v.uid == uid)
+    let uidData = user?.uids.find(v => v.uid == uid)
+    if (!uidData) {
+      this.send({ msg: '签到失败：链接已失效，请重新获取' })
+      return
+    }
     let data = uidData.status
     if (!data) {
       data = await connect.self.socketSend('doSign', { id, validate, ...uidData }, md5(`${new Date().getTime()}${uid}`))
       if (data.retcode == 0) {
         uidData.status = { ...data, msg: data.msg.replace('签到成功', '今天已签到') }
+        logger.info(`[mysSign] 签到成功, UID: ${uid}`)
       }
     }
     this.send(data)
