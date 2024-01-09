@@ -109,9 +109,10 @@ export class GTest extends plugin {
   }
 
   get address () {
-    let { Host, Key } = this.cfg
-    let protocol = Server.cfg.http.HTTPS ? 'https' : 'http'
-    let port = Server.cfg.http_listen[0]
+    let { Host } = this.cfg
+    let { PUBLIC_PROTOCOL, PUBLIC_PORT } = Server.cfg.config.config
+    let port = PUBLIC_PORT || Server.cfg.http_listen[0]
+    let protocol = PUBLIC_PROTOCOL || (Server.cfg.http.HTTPS ? 'https' : 'http')
     if (![80, 443].includes(port)) Host += `:${port}`
     return `${protocol}://${Host}${this.route}`
   }
