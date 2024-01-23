@@ -14,7 +14,7 @@ export class Middleware2 extends plugin {
 
   Invalid (req, res) {
     if (!res.writableEnded) {
-      res.status(404).render('404')
+      req.method == 'GET' ? res.status(404).render('404') : res.send({ status: 1, message: 'Invalid request' })
     }
   }
 

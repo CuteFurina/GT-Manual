@@ -1,7 +1,5 @@
 import lodash from 'lodash'
-import md5 from 'md5'
-
-let _connection = {}
+import { GTest } from './GTest.js'
 
 export class MysSign extends plugin {
   constructor () {
@@ -16,12 +14,7 @@ export class MysSign extends plugin {
           fnc: 'index'
         },
         {
-          method: 'get',
-          path: '/:key/:uid',
-          fnc: 'bbsSign'
-        },
-        {
-          method: 'post',
+          method: ['get', 'post'],
           path: '/:key/:uid',
           fnc: 'bbsSign'
         },
@@ -35,13 +28,14 @@ export class MysSign extends plugin {
   }
 
   index () {
+    let copyright = GTest.cfg.Copyright
     let { key } = this.params
-    let user = this.findUser(key)
+    let user = this.getUser(key)
     if (!user) {
       this.error('UID列表不存在或已失效')
       return
     }
-    this.render('mysSign/main', { key, user, copyright: this.cfg.Copyright })
+    this.render('mysSign', { key, user, copyright })
   }
 
   async bbsSign () {
@@ -50,37 +44,36 @@ export class MysSign extends plugin {
       validate = {
         geetest_challenge: this.params['validate[geetest_challenge]'],
         geetest_validate: this.params['validate[geetest_validate]'],
-        geetest_seccode: this.params['validate[geetest_seccode]'],
+        geetest_seccode: this.params['validate[geetest_seccode]']
       }
     }
-    connect = _connection[connect]
-    let user = connect[key]
+    connect = GTest.clients[connect]
+    let user = connect?.[key]
     let uidData = user?.uids.find(v => v.uid == uid)
     if (!uidData) {
       this.send({ msg: '签到失败：链接已失效，请重新获取' })
       return
     }
-    let data = uidData.status
+    let data = uidData.status || await connect.self.socketSend('doSign', { id, validate, ...uidData }, `${new Date().getTime()}${uid}`)
     if (!data) {
-      data = await connect.self.socketSend('doSign', { id, validate, ...uidData }, md5(`${new Date().getTime()}${uid}`))
-      if (data.retcode == 0) {
-        uidData.status = { ...data, msg: data.msg.replace('签到成功', '今天已签到') }
-        logger.info(`[mysSign] 签到成功, UID: ${uid}`)
-      }
+      data = { msg: '签到失败：请求超时' }
+    } else if (data.retcode == 0) {
+      uidData.status = { ...data, msg: data.msg.replace('签到成功', '今天已签到') }
+      logger.info(`[mysSign] 签到成功, UID: ${uid}`)
     }
     this.send(data)
   }
 
   connection () {
-    if (this.cfg.Key && this.request.query.key !== this.cfg.Key) return this.close()
+    if (GTest.cfg.REGISTER_KEY && this.request.query.key !== GTest.cfg.REGISTER_KEY) return this.close()
     this._wait = this._wait || {}
-    this._key = this.randomKey(10, _connection)
-    this.onClose(() => delete _connection[this._key])
+    this._key = GTest.randomKey(10, GTest.clients)
+    this.onClose(() => delete GTest.clients[this._key])
     this.onMessage((data) => {
       try {
         data = JSON.parse(data)
-        let { id, cmd, payload, key } = data
-        this._wait[id] && this._wait[id](payload) || this[cmd] && this[cmd](payload, id)
+        let { id, cmd, payload } = data
+        this._wait[id] ? this._wait[id](payload) : this[cmd] && this[cmd](payload, id)
       } catch (err) {
         logger.error(err)
       }
@@ -88,23 +81,23 @@ export class MysSign extends plugin {
   }
 
   async createUser (data, id) {
-    let connect = _connection[this._key]
+    let connect = GTest.clients[this._key]
     if (!connect.self) {
       connect.self = this
     }
     let key = this.hasUser(id)
     if (!key) {
-      key = this.randomKey(6, connect, { connect: this._key, id, uids: data })
+      key = GTest.randomKey(6, connect, { connect: this._key, id, uids: data })
       /** uid缓存10分钟 */
       setTimeout(() => connect && delete connect[key], 600 * 1000)
     }
-    let payload = { link: `${this.address}/${key}` }
+    let payload = { link: `${Server.cfg.http.PUBLIC_ADDRESS}${this.route}/${key}` }
     this.socketWrite('createUser', payload, id)
   }
 
   hasUser (id) {
     let ret = false
-    lodash.forEach(_connection, (connect) => {
+    lodash.forEach(GTest.clients, (connect) => {
       lodash.forEach(connect, (user, key) => {
         if (user.id == id) {
           ret = key
@@ -115,19 +108,12 @@ export class MysSign extends plugin {
     return ret
   }
 
-  findUser (key) {
-    let ret = false
-    let connect = this.findConnect(key)
-    if (connect) ret = connect[key]
-    return ret
-  }
-
-  findConnect (key) {
+  getUser (key) {
     let ret = false
     if (key) {
-      lodash.forEach(_connection, (connect) => {
+      lodash.forEach(GTest.clients, (connect) => {
         if (connect[key]) {
-          ret = connect
+          ret = connect[key]
           return false
         }
       })
@@ -136,7 +122,7 @@ export class MysSign extends plugin {
   }
 
   socketWrite (cmd, payload, id) {
-    if (!id || typeof id == 'number' && String(id).length == 13) id = new Date().getTime()
+    if (!id || (typeof id == 'number' && String(id).length == 13)) id = new Date().getTime()
     return this.socket.send(JSON.stringify({ id, cmd, payload, key: this._key }))
   }
 
@@ -146,28 +132,5 @@ export class MysSign extends plugin {
       this._wait[id] = resolve
       setTimeout(() => resolve(false) && delete this._wait[id], 5 * 1000)
     })
-  }
-
-  get cfg () {
-    return Server.cfg.getConfig('GTest')
-  }
-
-  get address () {
-    let { Host } = this.cfg
-    let { PUBLIC_PROTOCOL, PUBLIC_PORT } = Server.cfg.config.config
-    let port = PUBLIC_PORT || Server.cfg.http_listen[0]
-    let protocol = PUBLIC_PROTOCOL || (Server.cfg.http.HTTPS ? 'https' : 'http')
-    if (![80, 443].includes(port)) Host += `:${port}`
-    return `${protocol}://${Host}${this.route}`
-  }
-
-  randomKey (length, checkObj, data) {
-    let letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-    let key = lodash.sampleSize(letters, length).join('')
-    while (checkObj[key]) {
-      key = lodash.sampleSize(letters, length).join('')
-    }
-    checkObj[key] = data || {}
-    return key
   }
 }

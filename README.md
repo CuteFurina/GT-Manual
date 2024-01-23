@@ -1,30 +1,40 @@
-# 米游社手动验证
-
-* 此demo仅提供思路，可以参考demo自行编写内容至您的站点
+# GT-Manual服务端
  
-* ~~使用Yunzai-Bot可以参考此[提交](https://gitee.com/QQ1146638442/Miao-Yunzai/commit/c286fd0627253f8790912ad5802d6da0b9192774)~~  
-使用Miao-Yunzai可以参考此插件[GT-Manual-plugin](https://static.hlhs-nb.cn/upload/GT-Manual-plugin.zip)  
-若您不想部署demo或没有公网地址可以使用他人提供的公益接口
+Miao-Yunzai版本GTest插件：[GT-Manual-plugin](https://static.hlhs-nb.cn/upload/GT-Manual-plugin.zip)  
+若您不想部署demo或没有公网地址可以使用他人提供的接口
  
 * 值得一提的是QQ不允许直接访问IP地址  
 需要添加域名解析或复制地址到浏览器访问  
  
-* 若外部网络无法访问地址请前往防火墙放行对应端口，具体操作需自行百度
+* 若外部网络无法访问地址需要前往防火墙放行对应端口，具体操作请自行百度
 
-# 测试
+## 使用方法
+
+### 1.克隆项目
 
 ```
+# 克隆项目
 git clone https://gitee.com/QQ1146638442/GT-Manual.git
 cd GT-Manual
-npm install
+
+# 安装pnpm ，已安装的可以跳过
+npm install pnpm -g
+# 使用pnpm安装依赖
+pnpm install -P
 ```
-修改config.yaml配置
+
+### 2.运行服务
+
 ```
-# 前台启动
+# 前台运行
 node app
 
-# 后台启动
+# 后台运行
 npm start
-# 显示log
+# 显示日志
 npm run log
 ```
+
+### 3.修改配置
+
+首次运行会在config目录生成配置文件 ，根据说明修改完成后重启服务
