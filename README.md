@@ -1,6 +1,6 @@
 # GT-Manual服务端
  
-Miao-Yunzai版本GTest插件：[GT-Manual-plugin](https://static.hlhs-nb.cn/upload/GT-Manual-plugin.zip)  
+* Miao-Yunzai版本GTest插件：[GT-Manual-plugin](https://static.hlhs-nb.cn/upload/GT-Manual-plugin.zip)  
 若您不想部署demo或没有公网地址可以使用他人提供的接口
  
 * 值得一提的是QQ不允许直接访问IP地址  
