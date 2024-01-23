@@ -42,6 +42,11 @@ export class DailyHot extends plugin {
     this.render('hot', { cfg, _cfg_base64: Buffer.from(encodeURIComponent(JSON.stringify(cfg))).toString('base64') })
   }
 
+  /**
+   * 通过 '/hot/api'/ + 接口地址访问hotAPI接口，访问 '/hot/api/all' 可获取全部hot接口信息
+   * @param {string} [isNew] 是否从服务器获取最新
+   * @param {string} [date] 历史上的今天接口参数，格式 'MMDD'
+   */
   async hotApi () {
     await this.init()
     let { key } = this.params

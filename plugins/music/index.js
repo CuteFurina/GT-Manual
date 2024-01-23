@@ -61,6 +61,11 @@ export class NetEaseApi extends plugin {
     ]
   }
 
+  /**
+   * 文档https://docs.neteasecloudmusicapi.binaryify.com/
+   * 通过 '/music/api' + 接口地址进行访问netease接口
+   * 通过 '/music/api/meting' 访问MetingAPI接口，接收server、type、id三个参数
+   */
   async netEaseApi () {
     try {
       await this.init()
