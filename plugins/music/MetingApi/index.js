@@ -1,7 +1,6 @@
 import Tencent from './tencent.js'
 import Netease from './netease.js'
 import lyricFormat from './Format.js'
-import lodash from 'lodash'
 
 class MetingAPI {
   create (netEaseApi) {
@@ -23,7 +22,7 @@ class MetingAPI {
       identifier: 'meting',
       route: '/meting',
       module: ({ server, type, id, cookie }) => {
-        if (!(server && type && id && this.Providers[server])) throw this.error
+        if (!(type && id && this.Providers[server])) throw this.error
         return this.getData(server, type, id, cookie)
       }
     }
@@ -31,10 +30,8 @@ class MetingAPI {
 
   async getData (server, type, id, cookie) {
     let provider = this.Providers[server]
-    if (typeof cookie !== 'string') {
-      let str = ''
-      lodash.forEach((v, i) => str += `${i}=${v};`)
-      cookie = str
+    if (typeof cookie == 'object') {
+      cookie = Object.keys(cookie).map(i => `${encodeURIComponent(i)}=${encodeURIComponent(cookie[i])}`).join(';')
     }
     let body = await provider.get(type, id, cookie)
     if (!body) throw this.error

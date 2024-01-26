@@ -96,5 +96,6 @@ module.exports = {
   getModulesDefinitions,
   cacheMiddleware,
   moduleRequest,
+  cookieToJson,
   ...obj
 }

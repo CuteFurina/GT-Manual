@@ -73,7 +73,8 @@ export class NetEaseApi extends plugin {
       if (!moduleDef) return this.next()
       if (this.req.file) this.createFileObject(this.req.file)
       this.isModuleDef = true
-      let moduleResponse = await moduleDef.module({ ...this.params, cookie: this.cookie }, (...params) => {
+      this.params.cookie = { ...this.cookie, ...netease.cookieToJson(this.params.cookie) }
+      let moduleResponse = await moduleDef.module(this.params, (...params) => {
         let obj = [...params]
         let ip = this.req.ip
         if (ip.substr(0, 7) == '::ffff:') ip = ip.substr(7)
