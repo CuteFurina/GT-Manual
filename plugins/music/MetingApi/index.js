@@ -1,6 +1,7 @@
 import Tencent from './tencent.js'
 import Netease from './netease.js'
 import lyricFormat from './Format.js'
+import lodash from 'lodash'
 
 class MetingAPI {
   create (netEaseApi) {
@@ -30,6 +31,11 @@ class MetingAPI {
 
   async getData (server, type, id, cookie) {
     let provider = this.Providers[server]
+    if (typeof cookie !== 'string') {
+      let str = ''
+      lodash.forEach((v, i) => str += `${i}=${v};`)
+      cookie = str
+    }
     let body = await provider.get(type, id, cookie)
     if (!body) throw this.error
     return { body, type, server, handle: this.handle }
