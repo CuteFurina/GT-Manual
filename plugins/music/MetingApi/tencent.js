@@ -21,6 +21,9 @@ export default class TencentMusic {
       case 'playlist':
         ret = this.getPlaylist(id)
         break
+      case 'search':
+        ret = this.getSearch(id)
+        break
     }
     return ret
   }
@@ -156,6 +159,59 @@ export default class TencentMusic {
     }))
 
     return res.slice(0, 50)
+  }
+
+  async getSearch (keyword) {
+    let searchid = (Math.random() * 10000000).toFixed(0)
+    let data = {
+      req_0: {
+        module: 'music.search.SearchCgiService',
+        method: 'DoSearchForQQMusicDesktop',
+        param: {
+          searchid,
+          remoteplace: 'txt.mqq.all',
+          search_type: 0,
+          query: keyword,
+          page_num: 1,
+          num_per_page: 50
+        }
+      },
+      comm: {
+        uin: '',
+        format: 'json',
+        ct: 23,
+        cv: 0,
+        authst: ''
+      }
+    }
+
+    let params = {
+      '-': 'getplaysongvkey',
+      g_tk: 5381,
+      loginUin: '',
+      hostUin: 0,
+      format: 'json',
+      inCharset: 'utf8',
+      outCharset: 'utf-8¬ice=0',
+      platform: 'yqq.json',
+      needNewCode: 0,
+      data: JSON.stringify(data)
+    }
+
+    let url = this.changeUrlQuery(params, 'https://u.y.qq.com/cgi-bin/musicu.fcg')
+    let result = await (await fetch(url)).json()
+    result = result.req_0.data.body
+    return result.song.list.map(song => {
+      let songInfo = {
+        author: song.singer.reduce((i, v) => ((i ? i + ' / ' : i) + v.name), ''),
+        title: song.title,
+        pic: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${song.album.mid}.jpg`,
+        url: song.mid,
+        lrc: song.mid,
+        songmid: song.mid
+      }
+      return songInfo
+    })
   }
 
   changeUrlQuery (obj, baseUrl) {

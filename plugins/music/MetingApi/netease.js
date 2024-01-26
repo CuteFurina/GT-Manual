@@ -9,9 +9,6 @@ export default class Netease {
       case 'lrc':
         ret = this.getLyric(id)
         break
-      case 'artist':
-        ret = this.getArtists(id)
-        break
       case 'url':
         ret = this.getSongUrl(id)
         break
@@ -23,6 +20,12 @@ export default class Netease {
         break
       case 'playlist':
         ret = this.getPlaylist(id)
+        break
+      case 'artist':
+        ret = this.getArtists(id)
+        break
+      case 'search':
+        ret = this.getSearch(id)
         break
     }
     return ret
@@ -65,13 +68,19 @@ export default class Netease {
     return this.songListMap(res.body)
   }
 
+  async getSearch (keywords) {
+    let { body } = await this.netEaseApi.cloudsearch({ keywords, limit: 50 })
+    return this.songListMap(body.result)
+  }
+
   songListMap (list) {
     return list.songs.map(song => ({
       title: song.name,
       author: song.ar.reduce((i, v) => ((i ? i + ' / ' : i) + v.name), ''),
-      pic: song.al.picUrl,
+      pic: song.al.picUrl || list.album?.picUrl || list.album?.blurPicUrl || 'https://s4.music.126.net/style/web2/img/default/default_album.jpg',
       url: song.id,
-      lrc: song.id
+      lrc: song.id,
+      songmid: song.id
     }))
   }
 }
