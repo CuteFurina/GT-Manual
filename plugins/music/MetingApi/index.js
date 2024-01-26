@@ -21,16 +21,16 @@ class MetingAPI {
     return {
       identifier: 'meting',
       route: '/meting',
-      module: ({ server, type, id }) => {
+      module: ({ server, type, id, cookie }) => {
         if (!(server && type && id && this.Providers[server])) throw this.error
-        return this.getData(server, type, id)
+        return this.getData(server, type, id, cookie)
       }
     }
   }
 
-  async getData (server, type, id) {
+  async getData (server, type, id, cookie) {
     let provider = this.Providers[server]
-    let body = await provider.get(type, id)
+    let body = await provider.get(type, id, cookie)
     if (!body) throw this.error
     return { body, type, server, handle: this.handle }
   }

@@ -3,8 +3,9 @@ import qs from 'node:querystring'
 import url from 'node:url'
 
 export default class TencentMusic {
-  get (type, id) {
+  get (type, id, cookie = '') {
     let ret
+    this.cookie = cookie
     switch (type) {
       case 'lrc':
         ret = this.getLyric(id)
@@ -44,7 +45,7 @@ export default class TencentMusic {
     }
 
     const url = this.changeUrlQuery(data, 'http://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg')
-    let result = await (await fetch(url, { headers: { Referer: 'https://y.qq.com' } })).json()
+    let result = await (await fetch(url, { headers: { Referer: 'https://y.qq.com', cookie: this.cookie } })).json()
 
     return {
       lyric: decodeURIComponent(escape(atob(result.lyric || ''))),
@@ -92,7 +93,7 @@ export default class TencentMusic {
     }
 
     let url = this.changeUrlQuery(params, 'https://u.y.qq.com/cgi-bin/musicu.fcg')
-    let result = await (await fetch(url)).json()
+    let result = await (await fetch(url, { headers: { cookie: this.cookie } })).json()
 
     if (result.req_0?.data?.midurlinfo) {
       purl = result.req_0.data.midurlinfo[0].purl
@@ -114,7 +115,7 @@ export default class TencentMusic {
     }
 
     let url = this.changeUrlQuery(data, 'http://u.y.qq.com/cgi-bin/musicu.fcg')
-    let result = await (await fetch(url)).json()
+    let result = await (await fetch(url, { headers: { cookie: this.cookie } })).json()
     result = result.songinfo.data
 
     let songInfo = {
@@ -143,7 +144,7 @@ export default class TencentMusic {
     }
 
     let url = this.changeUrlQuery(data, 'http://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg')
-    let result = await (await fetch(url, { headers: { Referer: 'https://y.qq.com/n/yqq/playlist' } })).json()
+    let result = await (await fetch(url, { headers: { Referer: 'https://y.qq.com/n/yqq/playlist', cookie: this.cookie } })).json()
     result = result.cdlist[0].songlist
 
     let res = await Promise.all(result.map(async song => {
@@ -199,7 +200,7 @@ export default class TencentMusic {
     }
 
     let url = this.changeUrlQuery(params, 'https://u.y.qq.com/cgi-bin/musicu.fcg')
-    let result = await (await fetch(url)).json()
+    let result = await (await fetch(url, { headers: { cookie: this.cookie } })).json()
     result = result.req_0.data.body
     return result.song.list.map(song => {
       let songInfo = {

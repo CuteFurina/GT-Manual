@@ -3,8 +3,9 @@ export default class Netease {
     this.netEaseApi = netEaseApi
   }
 
-  get (type, id) {
+  get (type, id, cookie = '') {
     let ret
+    this.cookie = cookie
     switch (type) {
       case 'lrc':
         ret = this.getLyric(id)
@@ -32,7 +33,7 @@ export default class Netease {
   }
 
   async getLyric (id) {
-    let { body } = await this.netEaseApi.lyric({ id })
+    let { body } = await this.netEaseApi.lyric({ id, cookie: this.cookie })
     return {
       lyric: body.lrc?.lyric || '',
       tlyric: body.tlyric?.lyric || ''
@@ -40,36 +41,36 @@ export default class Netease {
   }
 
   async getSongUrl (id) {
-    let { body } = await this.netEaseApi.song_url_v1({ id, level: 'standard' })
+    let { body } = await this.netEaseApi.song_url_v1({ id, level: 'standard', cookie: this.cookie })
     let url = body.data?.[0]?.url?.replace('http://', 'https://')
     return url || `https://music.163.com/song/media/outer/url?id=${id}.mp3`
   }
 
   async getSongInfo (ids) {
-    let { body } = await this.netEaseApi.song_detail({ ids })
+    let { body } = await this.netEaseApi.song_detail({ ids, cookie: this.cookie })
     return this.songListMap(body)
   }
 
   async getArtists (id) {
-    let { body } = await this.netEaseApi.artist_top_song({ id })
+    let { body } = await this.netEaseApi.artist_top_song({ id, cookie: this.cookie })
     return this.songListMap(body)
   }
 
   async getAlbum (id) {
-    let { body } = await this.netEaseApi.album({ id })
+    let { body } = await this.netEaseApi.album({ id, cookie: this.cookie })
     return this.songListMap(body)
   }
 
   async getPlaylist (id) {
-    let { body } = await this.netEaseApi.playlist_detail({ id })
+    let { body } = await this.netEaseApi.playlist_detail({ id, cookie: this.cookie })
     let trackIds = body.playlist.trackIds.slice(0, 50)
     let ids = trackIds.map(v => v.id).join(',')
-    let res = await this.netEaseApi.song_detail({ ids })
+    let res = await this.netEaseApi.song_detail({ ids, cookie: this.cookie })
     return this.songListMap(res.body)
   }
 
   async getSearch (keywords) {
-    let { body } = await this.netEaseApi.cloudsearch({ keywords, limit: 50 })
+    let { body } = await this.netEaseApi.cloudsearch({ keywords, limit: 50, cookie: this.cookie })
     return this.songListMap(body.result)
   }
 
