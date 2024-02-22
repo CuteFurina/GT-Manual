@@ -35,7 +35,7 @@ export class NetEaseApi extends plugin {
 
   netEasePage () {
     let cfg = Server.cfg.getConfig('page/music', false)
-    this.render('music', { cfg, _cfg_base64: Buffer.from(encodeURIComponent(JSON.stringify(cfg))).toString('base64') })
+    this.render('music', { cfg })
   }
 
   async middleware () {
@@ -63,7 +63,7 @@ export class NetEaseApi extends plugin {
 
   /**
    * 文档https://docs.neteasecloudmusicapi.binaryify.com/
-   * 通过 '/music/api' + 接口地址进行访问netease接口
+   * 通过 '/music/api' + 接口地址 进行访问netease接口
    * 通过 '/music/api/meting' 访问MetingAPI接口，接收server、type、id三个参数
    */
   async netEaseApi () {

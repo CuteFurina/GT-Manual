@@ -18,6 +18,6 @@ export class HomePage extends plugin {
     for (let name of ['socialLinks', 'siteLinks', 'upData']) {
       cfg[name] = this.readJson(`./config/page/home/${name}.json`)
     }
-    this.render('index', { cfg, _cfg_base64: Buffer.from(encodeURIComponent(JSON.stringify(cfg))).toString('base64') })
+    this.render('index', { cfg })
   }
 }

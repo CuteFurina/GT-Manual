@@ -4,7 +4,7 @@ export class example extends plugin {
   constructor () {
     super({
       /** 插件名称 */
-      name: 'HomePage',
+      name: 'HelloWorld',
       rule: [
         {
           /** 请求方法 */

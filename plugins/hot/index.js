@@ -39,11 +39,11 @@ export class DailyHot extends plugin {
 
   hotPage () {
     let cfg = Server.cfg.getConfig('page/home', false)
-    this.render('hot', { cfg, _cfg_base64: Buffer.from(encodeURIComponent(JSON.stringify(cfg))).toString('base64') })
+    this.render('hot', { cfg })
   }
 
   /**
-   * 通过 '/hot/api'/ + 接口地址访问hotAPI接口，访问 '/hot/api/all' 可获取全部hot接口信息
+   * 通过 '/hot/api'/ + 接口地址 访问hotAPI接口，访问 '/hot/api/all' 可获取全部hot接口信息
    * @param {string} [isNew] 是否从服务器获取最新
    * @param {string} [date] 历史上的今天接口参数，格式 'MMDD'
    */
