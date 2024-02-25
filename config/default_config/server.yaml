@@ -22,8 +22,8 @@ CROSS_DOMAIN: true
 TRUST_PROXY: false
 # 信任来自以下IP的代理
 TRUST_PROXY_IP:
-    - '0.0.0.0'
-    - '123.123.123.123'
+  - '0.0.0.0'
+  - '123.123.123.123'
 
 # 公众访问地址
 PUBLIC_ADDRESS: 'http://example.com/'
