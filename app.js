@@ -1,8 +1,5 @@
-import server from './lib/server.js'
+import Server from './lib/server.js';
 
-/** 全局变量 Server */
-global.Server = await server.run()
+const app = Server.create();
 
-const app = require('./lib/server');
-
-module.exports = app;
+export default app;
